@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<table class='table'>
+	{% for note in notifications %}
+<tr>
+	<td>{{ note|safe }}</td>
+	<td>{% if note.read %} Read {% else %} Unread {% endif %}</td>
+	<!-- <td>{{ note.action }}</td>
+	<td>{{ note.action_object }}</td>
+	<td>{{ note.recipient }}</td>
+	<td>{{ note.target_object }}</td>
+	<td>{{ note.timestamp }}</td> -->
+</tr>
+	{% endfor %}
+</table>
+{% endblock %}

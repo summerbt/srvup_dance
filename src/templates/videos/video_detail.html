@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+
+{% block head_title %}| {% endblock %}
+<style>
+{% block style %}
+.reply_comment {
+display: none
+}
+{% endblock %}
+</style>
+
+<script>
+{% block jquery %}
+function update_iframe_size(){
+		// $("iframe").css("width", "100%");
+		// $("iframe").css("height", "100%");
+		var parent_id = $("iframe").parent().attr("id")
+		if (parent_id == 'main_video'){
+		var parent_class = $("iframe").parent().attr("class");
+		var parent_width = $("iframe").parent().width();
+		// console.log(parent_width);
+		// console.log(parent_class);
+		var width = $("iframe").css("width");
+		var height = $("iframe").css("height");
+		var ratio = parseInt(height)/parseInt(width)
+		var new_height = parseInt(parent_width)*ratio
+		// console.log(new_height);
+		// console.log(width);
+		// console.log(height);
+		$("iframe").css("width", parent_width);
+		$("iframe").css("height", new_height);
+	}
+}
+update_iframe_size();
+$(window).bind("resize", function(){
+	update_iframe_size();
+	// alert("resized");
+});
+
+$('.reply_btn').click(function(e){
+	e.preventDefault();
+	$(this).next('.reply_comment').fadeToggle();
+
+});
+
+
+
+
+
+
+{% endblock %}
+</script>
+
+{% block content %}
+<div class='col-sm-12' id='main_video'>
+{{ obj.embed_code|safe }}
+</div>
+{% if obj.tags %}
+<div class='col-sm-12'>
+{% for rel in obj.tags.all %}
+#{{ rel.tag }}
+{% endfor %}
+</div>
+{% endif %}
+<br/>
+
+<a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ obj.get_share_link }}">
+<i class="fa fa-facebook-square fa-3x"></i>
+</a>
+<a target="_blank" href="https://twitter.com/home?status={{ obj.get_share_message|safe }}">
+<i class="fa fa-twitter-square fa-3x"></i>
+</a>
+<a target="_blank" href='https://plus.google.com/share?url={{ obj.get_share_link }}'><i class="fa fa-google-plus-square fa-3x"></i></a>
+<a target="_blank" href="http://www.reddit.com/submit?url={{ obj.get_share_link }}&title={{ obj.get_share_title }}"><i class="fa fa-reddit-square fa-3x"></i></a>
+
+<br/>
+<hr/>
+
+<div class='row'>
+	<div class='col-sm-12'>
+		<h1>Comments/Questions</h1>
+		<form method="POST" action='{% url "comment_create" %}'>{% csrf_token %}
+			<input type='hidden' name='video_id' value='{{ obj.id }}'/>
+			<input type='hidden' name='origin_path' value='{{ request.get_full_path }}'/>
+			{% crispy comment_form comment_form.helper %}
+		</form>
+		<br/>
+		<br/>
+		<table class='table'>
+{% for comment in comments %}
+
+	<tr><td>{{ comment.get_comment }}
+	<br/><small>via {{ comment.user }} | {{ comment.timestamp|timesince }} ago</small>
+	{% if not comment.is_child %} 
+	<ul>
+	{% for child in comment.get_children %}
+	<li>{{ child.get_comment }} 
+	<small> via {{ child.user }} | {{child.timestamp|timesince }} ago</small></li>
+{% endfor %}
+			</ul>
+			 <a href='{{ comment.get_absolute_url }}'>View Thread</a> | <a href='{{ comment.get_absolute_url }}' class='reply_btn'>Add Reply</a>
+			<div class='reply_comment'>
+				<form method="POST" action='{% url "comment_create" %}'>{% csrf_token %}
+				<input type='hidden' name='video_id' value='{{ obj.id }}'/>
+				<input type='hidden' name='origin_path' value='{{ comment.get_origin }}'/>
+				<input type='hidden' name='parent_id' value='{{ comment.id }}'/>
+				{% crispy comment_form comment_form.helper %}
+				</form>
+			</div>
+			{% endif %}</td></tr>
+
+		{% endfor %}
+	</table>
+	</div>
+</div>
+{% endblock %}

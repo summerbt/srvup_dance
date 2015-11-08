@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block head_title %}Let's Groove | {% endblock %}
+
+    <style>
+    {% block style %}
+    h1 {
+    	color: #3f7cff;
+    }
+    {% endblock %}
+    </style>
+
+
+{% block content %}
+<form method='POST' action=''>{% csrf_token %}
+    {{ form.as_p }}
+    <input class='btn btn-primary' type='submit' value='Register'/>
+</form>
+
+<h1>#MusicalityMatters {{ the_name }}, {{ number }}</h1>
+
+
+<!-- <p>{{ videos }}</p> -->
+{% for video in videos %}
+<p>
+	{{ video.embed_code|safe }}
+	<br/>
+	<a href="{{ video.get_absolute_url }}">{{ video.title }}</a>
+</p>
+{% endfor %}
+
+<br/>
+<br/>
+<h1>Mark Safe</h1>
+{{ a_code }}
+<br/>
+<h1>Embeds[template tag "|safe"]</h1>
+
+{% for embed in embeds %}
+
+{{ embed|safe }}
+
+{% endfor %}
+
+{% endblock %}

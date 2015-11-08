@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}{% endblock %}
+
+
+
+{% block content %}
+
+{% for item in queryset %}
+<a href='{{ item.get_absolute_url }}'>{{ item }}</a> <br/>
+<a href='{{ item.get_absolute_url }}'><img src='{{ item.get_image_url }}' class='img-responsive'/></a> <br/>
+
+{% endfor %}
+
+{% endblock %}

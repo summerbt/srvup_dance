@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block head_title %}| {% endblock %}
+
+
+{% block content %}
+
+{% for item in queryset %}
+{{item.order}} - <a href='{{ item.get_absolute_url }}'>{{ item }}</a> <br/>
+{% endfor %}
+
+
+{% endblock %}
